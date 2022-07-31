@@ -1,0 +1,144 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage[margin=1in]{geometry} % full-width
+    \topskip        =   20pt
+    \parskip        =   10pt
+    \parindent      =   0 pt
+    \baselineskip   =   15pt
+\usepackage{amssymb, amsfonts, amsmath}
+\usepackage{bm}
+\usepackage{amsmath}
+\usepackage{booktabs}  % neatly formatting lines
+\usepackage{threeparttable}
+\usepackage{graphicx}
+\usepackage{caption}
+\usepackage{mathtools}
+\usepackage{subfig}
+\usepackage[shortlabels]{enumitem}
+
+%Russian-specific packages
+%--------------------------------------
+\usepackage[T2A]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[russian]{babel}
+
+\newcommand{\bo}[1]{\mathbf{#1}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\Cov}{\text{Cov}}
+\newcommand{\Y}{X_i'\beta + u_i}
+\newcommand{\img}[3]{
+    \begin{figure*}[!hbtp]
+        \centering
+        \caption{#3}
+        \includegraphics[scale=#2]{#1}
+    \end{figure*}
+}
+\newcommand{\imgs}[4]{
+    \begin{figure}[!hbtp]
+        \centering
+        \begin{minipage}{.5\textwidth}
+            \centering
+            \includegraphics[width=.9\linewidth]{#1}
+            \captionof{figure}{#3}
+        \end{minipage}
+        \begin{minipage}{.49\textwidth}
+            \centering
+            \includegraphics[width=.9\linewidth]{#2}
+            \captionof{figure}{#4}
+        \end{minipage}
+    \end{figure}
+}
+
+\begin{document}
+\subsection*{Binary probit panel model}
+\subsubsection*{Definition}
+Net utility from taking action in $ t $ is
+$ U_{nt} = V_{nt} + \varepsilon_{nt} $ and person takes action
+if $ U_{nt}> 0 $. This is the net utility, since it is difference
+between utility of taking action and that of not taking action.
+The errors are correlated over time, and the covariance matrix
+for $ \varepsilon_{n} = (\varepsilon_{n1}, \dots, \varepsilon_{nT}) $
+is $ \Omega\in\mathbb{R}^{T\times T} $. The sequence of actions
+that person $ n $ takes can be represented by a set of $ T $ dummy
+variables: $ d_{nt} = 1 $ if person $ n $ took action at $ t $ and
+$ d_{nt} = -1 $ otherwise. The probability of sequence if choices
+$ d_n = (d_{n1}, \dots, d_{nT}) $ is
+\begin{align*}
+    P_{nd_n} & = P(U_{nt}d_{nt}>0~ \forall t)                                   \\
+             & = P(V_{nt}d_{nt} + \varepsilon_{nt}d_{nt} > 0 ~\forall t)        \\
+             & = \int_{\varepsilon_n \in B_n} \phi(\varepsilon_n)d\varepsilon_n
+\end{align*}
+where $ B_n $ is a set such that $ V_{nt}d_{nt} + \varepsilon_{nt}d_{nt} > 0 $
+\textbf{for all} $ t $ and $ \phi(\varepsilon_n)  $ is a joint
+normal density with covariance matrix $ \Omega $. Once again,
+mathematically:
+$$ B_n = \{ \varepsilon_n = (\varepsilon_{n1}, \dots, \varepsilon_{nT}) ~|~V_{nt}d_{nt} + \varepsilon_{nt}d_{nt} > 0 \quad \forall t = 1...T\} $$
+
+\subsubsection*{Structure on error covariance}
+Structure can be placed on the covariance of the errors over time.
+Further we will suppose, that the error consists of a portion that
+is specific to the decision maker, reflecting his proclivity to
+take the action, and a part that varies over time for each
+decision maker: $ \varepsilon_{nt} = \eta_{n} + \mu_{nt} $,
+where $ \mu_{nt} $  is iid over time and people with a
+standard normal density, and $ \eta_n $ is iid over people
+with a normal density with zero mean and variance $ \sigma $.
+And $ V(\varepsilon_{nt}) = V(\eta_{n} + \mu_{nt}) = V(\eta_n) + V(\mu_{nt}) =
+    \sigma +1 $. Covariance between two time periods $ s $ and $ t $
+is
+$$ \Cov(\varepsilon_{nt}, \varepsilon_{ns}) =
+    \Cov(\eta_{n} + \mu_{nt}, \eta_{n} + \mu_{ns})= \sigma $$
+Therefore covariance matrix $ \Omega $ takes form of:
+$$
+    \Omega = \begin{pmatrix*}
+        \sigma + 1 & \sigma & \dots & \sigma \\
+        \sigma  & \sigma + 1 & \dots & \sigma \\
+        \dots  & \dots & \dots & \dots \\
+        \sigma  & \dots & \dots & \sigma + 1 \\
+    \end{pmatrix*}
+$$
+Only one parameter $ \sigma $, enters the covariance matrix.
+its value indicates the variance in unobserved utility across
+indidividuals (the variance of $ \eta_n $)
+relative to the variance across time for each individual
+(the variance of $ \mu_{nt} $).
+
+\subsubsection*{Estimation of the parameters}
+In order to estimate parameters we need to simulate the choice
+probabilities. It is advised by \textit{Train} to use error
+partioning approach. Conditional on $ \eta_n $, the probability
+of not taking the action in period $ t $ is
+$ P(V_{nt} + \eta_n + \mu_{nt} < 0) = P(\mu_{nt} < -(V_{nt} + \eta_n )) =
+    \Phi(-(V_{nt} + \eta_n))$, where $ \Phi $ is cdf of standard normal
+distribution. Probability of taking action is then:
+$1 - \Phi(-(V_{nt} + \eta_n)) = \Phi(V_{nt} + \eta_n)$.
+The probability of the sequence of choices $ d_n = (d_{n1}, \dots, d_{nT}) $
+is then:
+$$
+    H_{nd_n}(\eta_n) = \prod_{t=1}^{T}\Phi((V_{nt} + \eta_n)d_{nt})
+$$
+So far we have conditioned on $ \eta_n $, when in fact $ \eta_n $
+is random. The unconditional probability is the integral of the
+conditional probability $ H_{nd_n}(\eta_n) $ over all possible
+values of $ \eta_n $:
+$$ P_{nd_n} = \int_{\mathbb{R}}  H_{nd_n}(\eta_n) \phi(\eta_n)d\eta_n$$
+where $ \phi (\eta_n) $ is normal density with zero mean and
+variance $ \sigma $. Overall result:
+$$
+    P_{nd_n} = \int_{\mathbb{R}}  \prod_{t=1}^{T}\Phi((V_{nt} + \eta_n)d_{nt}) \phi(\eta_n)d\eta_n
+$$
+Once again $ P_{nd_n} $ is unconditional probability that agent
+$ n $ will choose sequence of choices $ d_n = (d_{n1}, \dots, d_{nT}) $,
+where each action $ d_{nt} $ is either $ 1 $ if action is taken and
+zero otherwise. \textit{Train} (ch 5, pg. 17) proposes to use the
+following algorithm for $ P_{nd_n} $ estimation:
+\begin{enumerate}[itemsep=0em]
+    \item Take a draw from a normal density with zero mean
+          and $ \sigma $ variance.
+    \item For this draw of $ \eta_n $, calculate $ H_{nd_n}(\eta_n) $ .
+    \item Repeat steps 1–2 many times, and average the results.
+          This average is a simulated approximation to $ P_{nd_n} $ .
+\end{enumerate}
+
+
+\end{document}
