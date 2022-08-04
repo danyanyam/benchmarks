@@ -64,12 +64,12 @@ variables: $ d_{nt} = 1 $ if person $ n $ took action at $ t $ and
 $ d_{nt} = -1 $ otherwise. The probability of sequence if choices
 $ d_n = (d_{n1}, \dots, d_{nT}) $ is
 \begin{align*}
-    P_{nd_n} & = P(U_{nt}d_{nt}>0~ \forall t)                                   \\
-             & = P(V_{nt}d_{nt} + \varepsilon_{nt}d_{nt} > 0 ~\forall t)        \\
-             & = \int_{\varepsilon_n \in B_n} \phi(\varepsilon_n)d\varepsilon_n
+    P(d_n| V_n) & = P(U_{nt}d_{nt}>0~|V_n,~ \forall t)                                      \\
+                & = P(V_{nt}d_{nt} + \varepsilon_{nt}d_{nt} > 0 ~|V_n~\forall t)            \\
+                & = \int_{\varepsilon_n \in B_n} \phi_{\Omega}(\varepsilon_n)d\varepsilon_n
 \end{align*}
 where $ B_n $ is a set such that $ V_{nt}d_{nt} + \varepsilon_{nt}d_{nt} > 0 $
-\textbf{for all} $ t $ and $ \phi(\varepsilon_n)  $ is a joint
+\textbf{for all} $ t $ and $ \phi_{\Omega}(\varepsilon_n)  $ is a joint
 normal density with covariance matrix $ \Omega $. Once again,
 mathematically:
 $$ B_n = \{ \varepsilon_n = (\varepsilon_{n1}, \dots, \varepsilon_{nT}) ~|~V_{nt}d_{nt} + \varepsilon_{nt}d_{nt} > 0 \quad \forall t = 1...T\} $$
@@ -115,29 +115,28 @@ $1 - \Phi(-(V_{nt} + \eta_n)) = \Phi(V_{nt} + \eta_n)$.
 The probability of the sequence of choices $ d_n = (d_{n1}, \dots, d_{nT}) $
 is then:
 $$
-    H_{nd_n}(\eta_n) = \prod_{t=1}^{T}\Phi((V_{nt} + \eta_n)d_{nt})
+    P(d_n |\eta_n, V_n) = \prod_{t=1}^{T}\Phi((V_{nt} + \eta_n)d_{nt})
 $$
 So far we have conditioned on $ \eta_n $, when in fact $ \eta_n $
 is random. The unconditional probability is the integral of the
-conditional probability $ H_{nd_n}(\eta_n) $ over all possible
+conditional probability $ P(d_n |\eta_n, V_n) $ over all possible
 values of $ \eta_n $:
-$$ P_{nd_n} = \int_{\mathbb{R}}  H_{nd_n}(\eta_n) \phi(\eta_n)d\eta_n$$
-where $ \phi (\eta_n) $ is normal density with zero mean and
+$$ P(d_n | V_n) = \int_{\mathbb{R}}  P(d_n |\eta_n, V_n) \phi_\sigma(\eta_n)d\eta_n$$
+where $ \phi_\sigma (\eta_n) $ is normal density with zero mean and
 variance $ \sigma $. Overall result:
 $$
-    P_{nd_n} = \int_{\mathbb{R}}  \prod_{t=1}^{T}\Phi((V_{nt} + \eta_n)d_{nt}) \phi(\eta_n)d\eta_n
+    P(d_n| V_n) = \int_{\mathbb{R}}  \prod_{t=1}^{T}\Phi((V_{nt} + \eta_n)d_{nt}) \phi_\sigma(\eta_n)d\eta_n
 $$
-Once again $ P_{nd_n} $ is unconditional probability that agent
+Once again $ P(d_n| V_n) $ is unconditional (w.r.t $\eta_n$) probability that agent
 $ n $ will choose sequence of choices $ d_n = (d_{n1}, \dots, d_{nT}) $,
 where each action $ d_{nt} $ is either $ 1 $ if action is taken and
-zero otherwise. \textit{Train} (ch 5, pg. 17) proposes to use the
-following algorithm for $ P_{nd_n} $ estimation:
+$-1$ otherwise. \textit{Train} (ch 5, pg. 17) proposes to use the
+following algorithm for $ P(d_n| V_n) $ estimation:
 \begin{enumerate}[itemsep=0em]
-    \item Take a draw from a normal density with zero mean
-          and $ \sigma $ variance.
-    \item For this draw of $ \eta_n $, calculate $ H_{nd_n}(\eta_n) $ .
+    \item Take a draw of $\eta_n$ from $\phi_{\sigma}(\eta_n)$.
+    \item For this draw of $ \eta_n $, calculate $ P(d_n |\eta_n, V_n) $ .
     \item Repeat steps 1–2 many times, and average the results.
-          This average is a simulated approximation to $ P_{nd_n} $ .
+          This average is a simulated approximation to $ P(d_n| V_n) $ .
 \end{enumerate}
 
 
