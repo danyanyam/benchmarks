@@ -64,15 +64,18 @@ variables: $ d_{nt} = 1 $ if person $ n $ took action at $ t $ and
 $ d_{nt} = -1 $ otherwise. The probability of sequence if choices
 $ d_n = (d_{n1}, \dots, d_{nT}) $ is
 \begin{align*}
-    P(d_n| V_n) & = P(U_{nt}d_{nt}>0~|V_n,~ \forall t)                                      \\
-                & = P(V_{nt}d_{nt} + \varepsilon_{nt}d_{nt} > 0 ~|V_n~\forall t)            \\
-                & = \int_{\varepsilon_n \in B_n} \phi_{\Omega}(\varepsilon_n)d\varepsilon_n
+    P(d_n| V_n) & = P(U_{nt}d_{nt}>0~|V_n,~ \forall t)                        \\
+                & = P(V_{nt}d_{nt} + \varepsilon_{nt}d_{nt} > 0 ~|V_n~\forall
+    t)                                                                        \\
+                & = \int_{\varepsilon_n \in B_n} \phi_{\Omega}(\varepsilon_n)
+    d\varepsilon_n
 \end{align*}
 where $ B_n $ is a set such that $ V_{nt}d_{nt} + \varepsilon_{nt}d_{nt} > 0 $
 \textbf{for all} $ t $ and $ \phi_{\Omega}(\varepsilon_n)  $ is a joint
 normal density with covariance matrix $ \Omega $. Once again,
 mathematically:
-$$ B_n = \{ \varepsilon_n = (\varepsilon_{n1}, \dots, \varepsilon_{nT}) ~|~V_{nt}d_{nt} + \varepsilon_{nt}d_{nt} > 0 \quad \forall t = 1...T\} $$
+$$ B_n = \{ \varepsilon_n = (\varepsilon_{n1}, \dots, \varepsilon_{nT})
+    ~|~V_{nt}d_{nt} + \varepsilon_{nt}d_{nt} > 0 \quad \forall t = 1...T\} $$
 
 \subsubsection*{Structure on error covariance}
 Structure can be placed on the covariance of the errors over time.
@@ -121,23 +124,61 @@ So far we have conditioned on $ \eta_n $, when in fact $ \eta_n $
 is random. The unconditional probability is the integral of the
 conditional probability $ P(d_n |\eta_n, V_n) $ over all possible
 values of $ \eta_n $:
-$$ P(d_n | V_n) = \int_{\mathbb{R}}  P(d_n |\eta_n, V_n) \phi_\sigma(\eta_n)d\eta_n$$
+$$ P(d_n | V_n) = \int_{\mathbb{R}}  P(d_n |\eta_n, V_n) \phi_\sigma(\eta_n)
+    d\eta_n$$
 where $ \phi_\sigma (\eta_n) $ is normal density with zero mean and
 variance $ \sigma $. Overall result:
 $$
-    P(d_n| V_n) = \int_{\mathbb{R}}  \prod_{t=1}^{T}\Phi((V_{nt} + \eta_n)d_{nt}) \phi_\sigma(\eta_n)d\eta_n
+    P(d_n| V_n) = \int_{\mathbb{R}}  \prod_{t=1}^{T}\Phi((V_{nt} + \eta_n)
+    d_{nt}) \phi_\sigma(\eta_n)d\eta_n
 $$
-Once again $ P(d_n| V_n) $ is unconditional (w.r.t $\eta_n$) probability that agent
-$ n $ will choose sequence of choices $ d_n = (d_{n1}, \dots, d_{nT}) $,
+Once again $ P(d_n| V_n) $ is unconditional (w.r.t $\eta_n$) probability that
+agent $ n $ will choose sequence of choices $ d_n = (d_{n1}, \dots, d_{nT}) $,
 where each action $ d_{nt} $ is either $ 1 $ if action is taken and
 $-1$ otherwise. \textit{Train} (ch 5, pg. 17) proposes to use the
 following algorithm for $ P(d_n| V_n) $ estimation:
 \begin{enumerate}[itemsep=0em]
-    \item Take a draw of $\eta_n$ from $\phi_{\sigma}(\eta_n)$.
-    \item For this draw of $ \eta_n $, calculate $ P(d_n |\eta_n, V_n) $ .
+    \item Take a draw of $\eta_n$ from $\phi_{\sigma}(\eta_n)$
+    \item For this draw of $ \eta_n $, calculate $ P(d_n |\eta_n, V_n) $
     \item Repeat steps 1–2 many times, and average the results.
-          This average is a simulated approximation to $ P(d_n| V_n) $ .
+          This average is a simulated approximation to $ P(d_n| V_n) $
 \end{enumerate}
+
+So far we have conditioned all of our probabilities on $V_n$, but we have data
+as inputs, namely agents' and attributes' characteristics which are described
+as $x_{n} = (x_{n1}, \dots. x_{nT})$. Since we incorporate taste variation,
+$V_n = \beta_n'x_{n}$ becomes random, since $\beta_n$ is a random vector.
+In order to estimate the model we should understand likelihood function. Since
+we have binary choice situation, lets stick to the following notation:
+probability of agent $n$ choosing
+sequence of choices $ d_n = (d_{n1}, \dots, d_{nT}) \in \{-1, 1\}^{T}$ is
+$P(d_n |x_n)$, or in other words, conditional probability on given agent's $n$
+attributes and choice characteristics.
+
+Lets also notice, that we have taste variation, which implies the following:
+$$
+    P(d_n |x_n) = \int_{\mathbb{R}^k} P(d_n |\beta_n, x_n)\phi_{\Sigma}
+    (\beta_n)d\beta_n
+$$
+The next step is to remember that $P(d_n |\beta_n, x_n) = P(d_n | V_n)$:
+$$
+    P(d_n |\beta_n, x_n) = \int_{\mathbb{R}} P(d_n |\eta_n, \beta_n, x_n)
+    \phi_{\sigma}(\eta_n)d\eta_n
+$$
+Having everything put together, we obtain:
+\begin{align*}
+    P(d_n |x_n) & = \int_{\mathbb{R}^k} \left(\int_{\mathbb{R}}
+    P(d_n |\eta_n, \beta_n, x_n) \phi_{\sigma}(\eta_n)d\eta_n \right)
+    \phi_{\Sigma}(\beta_n)d\beta_n                              \\
+                & =\int_{\mathbb{R}^k}\left(\int_{\mathbb{R}}
+    \prod_{t=1}^{T}\Phi((\beta_n'x_{nt} + \eta_n)d_{nt})
+    \phi_{\sigma}(\eta_n)d\eta_n \right)\phi_{\Sigma}(\beta_{n})
+    d\beta_{n}
+\end{align*}
+where $\phi_{\Sigma}(\beta_n)$ is joint normal pdf with expectation $\pmb{b}$
+covariance matrix $\pmb\Sigma$ and $\phi_{\sigma}(\eta_n)$ is normal pdf with
+zero expectation and variance $\sigma$
+
 
 
 \end{document}
